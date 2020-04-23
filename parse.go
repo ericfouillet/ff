@@ -32,6 +32,12 @@ func Parse(fs *flag.FlagSet, args []string, options ...Option) error {
 	if parseEnv := c.envVarPrefix != "" || c.envVarNoPrefix; parseEnv {
 		var visitErr error
 		fs.VisitAll(func(f *flag.Flag) {
+			var key string
+			key = strings.ToUpper(f.Name)
+			key = envVarReplacer.Replace(key)
+			key = maybePrefix(key, c.envVarNoPrefix, c.envVarPrefix)
+			f.Usage = fmt.Sprintf("%s (also via env var %s)", f.Usage, key)
+
 			if visitErr != nil {
 				return
 			}
@@ -39,11 +45,6 @@ func Parse(fs *flag.FlagSet, args []string, options ...Option) error {
 			if provided[f.Name] {
 				return
 			}
-
-			var key string
-			key = strings.ToUpper(f.Name)
-			key = envVarReplacer.Replace(key)
-			key = maybePrefix(key, c.envVarNoPrefix, c.envVarPrefix)
 
 			value := os.Getenv(key)
 			if value == "" {
@@ -62,6 +63,7 @@ func Parse(fs *flag.FlagSet, args []string, options ...Option) error {
 		}
 	}
 
+	// TODO: needed ? Could be done in the VisitAll above
 	fs.Visit(func(f *flag.Flag) {
 		provided[f.Name] = true
 	})
@@ -108,6 +110,7 @@ func Parse(fs *flag.FlagSet, args []string, options ...Option) error {
 		}
 	}
 
+	// TODO: again, could be done in the loop above
 	fs.Visit(func(f *flag.Flag) {
 		provided[f.Name] = true
 	})
