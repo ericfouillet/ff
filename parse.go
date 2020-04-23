@@ -63,7 +63,6 @@ func Parse(fs *flag.FlagSet, args []string, options ...Option) error {
 		}
 	}
 
-	// TODO: needed ? Could be done in the VisitAll above
 	fs.Visit(func(f *flag.Flag) {
 		provided[f.Name] = true
 	})
@@ -110,7 +109,6 @@ func Parse(fs *flag.FlagSet, args []string, options ...Option) error {
 		}
 	}
 
-	// TODO: again, could be done in the loop above
 	fs.Visit(func(f *flag.Flag) {
 		provided[f.Name] = true
 	})
